@@ -1,41 +1,19 @@
 <div align="center">
 
-<h1>MultiOOD: Scaling Out-of-Distribution Detection for Multiple Modalities</h1>
-
-<div>
-    <a href='https://sites.google.com/view/dong-hao/' target='_blank'>Hao Dong</a><sup>1</sup>
-    &emsp;
-    <a href='https://viterbi-web.usc.edu/~yzhao010/' target='_blank'>Yue Zhao</a><sup>2</sup>
-    &emsp;
-    <a href='https://chatzi.ibk.ethz.ch/about-us/people/prof-dr-eleni-chatzi.html' target='_blank'>Eleni Chatzi</a><sup>1</sup>
-    &emsp;
-    <a href='https://people.epfl.ch/olga.fink?lang=en' target='_blank'>Olga Fink</a><sup>3</sup>
-</div>
-<div>
-    <sup>1</sup>ETH Zurich, <sup>2</sup>University of Southern California, <sup>3</sup>EPFL
-</div>
-
-
-<div>
-    <h4 align="center">
-        • <a href="https://arxiv.org/abs/2405.17419" target='_blank'>NeurIPS 2024 (spotlight)</a> •
-    </h4>
-</div>
-
-
+<h1>Secure On-Device Video OOD Detection Without Backpropagation</h1>
 
 <div style="text-align:center">
-<img src="imgs/multiood.jpg"  width="100%" height="100%">
+<img src="imgs/FigA.jpg"  width="100%" height="100%">
 </div>
 
 ---
 
 </div>
 
-MultiOOD is the first-of-its-kind benchmark for Multimodal OOD Detection, characterized by diverse dataset sizes and varying modality combinations.
+SecDOOD is a secure cloud-device collaboration framework for efficient on-device OOD detection without requiring device-side backpropagation.
 
-## MultiOOD Benchmark
-MultiOOD is based on five public action recognition datasets (HMDB51, UCF101, EPIC-Kitchens, HAC, and Kinetics-600). 
+## SecDOOD Benchmark
+SecDOOD is based on five public action recognition datasets (HMDB51, UCF101, EPIC-Kitchens, HAC, and Kinetics-600). 
 
 ### Prepare Datasets
 1. Download HMDB51 video data from [link](https://serre-lab.clps.brown.edu/resource/hmdb-a-large-human-motion-database/#Downloads) and extract. Download HMDB51 optical flow data from [link](https://huggingface.co/datasets/hdong51/MultiOOD/blob/main/hmdb51_flow_mp4.tar.gz) and extract. The directory structure should be modified to match:
@@ -204,7 +182,7 @@ The splits for Multimodal Near-OOD and Far-OOD Benchmarks are provided under `HM
 
 ## Methodology
 <div style="text-align:left">
-<img src="imgs/frame.jpg"  width="80%" height="100%">
+<img src="imgs/FigB.jpg"  width="80%" height="100%">
 </div>
 
 ---

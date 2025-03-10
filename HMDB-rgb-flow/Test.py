@@ -298,7 +298,7 @@ if __name__ == '__main__':
 
     model.load_state_dict(checkpoint['model_state_dict'])
     if args.appen != 'Rand':
-        print('读取了HyperNetwork参数')
+        print('Read HyperNetwork Params')
         hyper_network.load_state_dict(checkpoint['hyper_network_state_dict'])
     else:
         mlp_cls = Encoder(input_dim=v_dim+f_dim, out_dim=num_class)
