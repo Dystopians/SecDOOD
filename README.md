@@ -3,7 +3,7 @@
 <h1>Secure On-Device Video OOD Detection Without Backpropagation</h1>
 
 <div style="text-align:center">
-<img src="imgs/FigA.jpg"  width="100%" height="100%">
+<img src="imgs/FigA.png"  width="100%" height="100%">
 </div>
 
 ---
@@ -182,7 +182,7 @@ The splits for Multimodal Near-OOD and Far-OOD Benchmarks are provided under `HM
 
 ## Methodology
 <div style="text-align:left">
-<img src="imgs/FigB.jpg"  width="80%" height="100%">
+<img src="imgs/FigB.png"  width="80%" height="100%">
 </div>
 
 ---
