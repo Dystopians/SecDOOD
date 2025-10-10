@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SecDOOD is a secure cloud-device collaboration framework for video out-of-distribution detection without on-device backpropagation.">
+  <meta name="keywords" content="SecDOOD, OOD Detection, Video Understanding, Multimodal Learning">
+  <title>SecDOOD | Secure On-Device Video OOD Detection</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/github-repo-git-octocat-svgrepo-com.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+  <nav class="navbar is-transparent" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="#top">
+        <img src="imgs/logo_.png" alt="SecDOOD logo" style="max-height: 3rem;">
+      </a>
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar-menu">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="navbar-menu" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#overview">Overview</a>
+        <a class="navbar-item" href="#features">Features</a>
+        <a class="navbar-item" href="#benchmark">Benchmark</a>
+        <a class="navbar-item" href="#methodology">Methodology</a>
+        <a class="navbar-item" href="#getting-started">Getting Started</a>
+        <a class="navbar-item" href="#resources">Resources</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero is-primary is-medium" id="top">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns is-vcentered">
+          <div class="column is-6">
+            <h1 class="title is-1">Secure On-Device Video OOD Detection</h1>
+            <p class="subtitle is-4">A privacy-conscious framework for multimodal out-of-distribution detection without on-device backpropagation.</p>
+            <div class="buttons">
+              <a class="button is-light is-rounded" href="https://arxiv.org/abs/2503.06166" target="_blank" rel="noopener">Paper</a>
+              <a class="button is-light is-rounded" href="https://github.com/Dystopians/SecDOOD" target="_blank" rel="noopener">Code</a>
+              <a class="button is-light is-rounded" href="#getting-started">Quickstart</a>
+            </div>
+            <div class="badges" style="margin-top: 1.25rem;">
+              <img alt="GitHub stars" src="https://img.shields.io/github/stars/Dystopians/SecDOOD" style="margin-right: 0.5rem;">
+              <img alt="License" src="https://img.shields.io/badge/license-MIT-blue" style="margin-right: 0.5rem;">
+              <a href="https://arxiv.org/abs/2503.06166" target="_blank" rel="noopener">
+                <img alt="arXiv" src="https://img.shields.io/badge/arXiv-2503.06166-B31B1B">
+              </a>
+            </div>
+          </div>
+          <div class="column is-offset-1 is-5 has-text-centered">
+            <img src="imgs/FigA.png" alt="SecDOOD framework" style="border-radius: 12px; box-shadow: 0 20px 60px rgba(10, 10, 10, 0.2);">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="essentials">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">SecDOOD at a Glance</h2>
+      <div class="columns is-multiline">
+        <div class="column is-4">
+          <div class="box">
+            <h3 class="title is-4">Goal</h3>
+            <p>Deliver on-device video out-of-distribution detection without any device-side backpropagation while preserving user privacy.</p>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="box">
+            <h3 class="title is-4">Approach</h3>
+            <p>A cloud-hosted HyperNetwork generates device-specific classifier weights from an encrypted summary of device features. Devices run forward-only inference; gradients and raw data never leave the device.</p>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="box">
+            <h3 class="title is-4">Workflow</h3>
+            <ol>
+              <li><strong>Cloud (offline):</strong> Train base model <span style="font-family: 'Courier New', monospace;">M<sub>g</sub></span> and HyperNetwork <span style="font-family: 'Courier New', monospace;">H</span>.</li>
+              <li><strong>Device (online):</strong> Extract features, rank channel importance, encrypt the top α% channels, mask the rest, and send the encrypted subset.</li>
+              <li><strong>Cloud → Device:</strong> Evaluate <span style="font-family: 'Courier New', monospace;">H</span> on encrypted features to produce <span style="font-family: 'Courier New', monospace;">Θ<sub>d</sub></span> and return for inference.</li>
+            </ol>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="box">
+            <h3 class="title is-4">Privacy &amp; Efficiency</h3>
+            <p>Raw videos and full feature tensors remain local. Dynamic channel sampling plus selective encryption minimize bandwidth and crypto overhead with negligible accuracy loss.</p>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="box">
+            <h3 class="title is-4">Compatibility</h3>
+            <p>Drop-in support for common OOD scores (MSP, Energy, VIM) and modalities (RGB, optical flow, audio). Works for both near- and far-OOD settings.</p>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="box">
+            <h3 class="title is-4">Results</h3>
+            <p>Across HMDB51, UCF101, EPIC-Kitchens, HAC, and Kinetics-600, SecDOOD improves AUROC and reduces FPR@95 compared to local post-processing baselines—without any on-device training.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="overview">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column">
+          <h2 class="title is-3 has-text-centered">Why SecDOOD?</h2>
+          <p class="is-size-5 has-text-justified">
+            SecDOOD introduces a secure collaboration paradigm between cloud services and resource-constrained devices. By delegating heavy-weight optimization to the cloud, SecDOOD enables reliable, low-latency out-of-distribution detection on the edge while preserving data privacy. The framework scales to large multimodal datasets and eliminates the need for device-side backpropagation.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section has-background-light" id="features">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Key Capabilities</h2>
+      <div class="columns is-multiline">
+        <div class="column is-6">
+          <div class="box feature-card">
+            <h3 class="title is-4">Multimodal Fusion</h3>
+            <p>Integrates RGB video, optical flow, and audio cues for robust detection under diverse conditions.</p>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="box feature-card">
+            <h3 class="title is-4">Backprop-Free On-Device</h3>
+            <p>Performs inference-only OOD detection on-device, keeping data local and reducing compute costs.</p>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="box feature-card">
+            <h3 class="title is-4">Adaptive A2D Algorithm</h3>
+            <p>Encourages prediction discrepancy across modalities to expose uncertain or anomalous inputs.</p>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="box feature-card">
+            <h3 class="title is-4">NP-Mix Outlier Synthesis</h3>
+            <p>Explores wider feature spaces through synthesized outliers, boosting near- and far-OOD performance.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="benchmark">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Comprehensive Benchmark Suite</h2>
+      <p class="subtitle is-5 has-text-centered">SecDOOD covers five public action recognition datasets for both near- and far-OOD evaluation.</p>
+      <div class="columns is-multiline is-variable is-6">
+        <div class="column is-4">
+          <div class="card">
+            <header class="card-header">
+              <p class="card-header-title">HMDB51</p>
+            </header>
+            <div class="card-content">
+              <p>RGB + optical flow modalities with curated near- and far-OOD splits for human actions.</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="card">
+            <header class="card-header">
+              <p class="card-header-title">UCF101</p>
+            </header>
+            <div class="card-content">
+              <p>Extensive human action repertoire enabling cross-dataset evaluation against HMDB51 and Kinetics.</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="card">
+            <header class="card-header">
+              <p class="card-header-title">EPIC-Kitchens</p>
+            </header>
+            <div class="card-content">
+              <p>Egocentric kitchen interactions featuring RGB, flow, and audio triplets with dedicated scripts.</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="card">
+            <header class="card-header">
+              <p class="card-header-title">HAC</p>
+            </header>
+            <div class="card-content">
+              <p>Human, animal, and cartoon domains designed to stress-test far-OOD generalization.</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="card">
+            <header class="card-header">
+              <p class="card-header-title">Kinetics-600</p>
+            </header>
+            <div class="card-content">
+              <p>Large-scale benchmark with downloadable flow and audio for near- and far-OOD protocols.</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="card">
+            <header class="card-header">
+              <p class="card-header-title">Curated Splits</p>
+            </header>
+            <div class="card-content">
+              <p>Pre-defined splits under <code>HMDB-rgb-flow/splits/</code> and <code>EPIC-rgb-flow/splits/</code> for reproducibility.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section has-background-light" id="methodology">
+    <div class="container is-max-desktop">
+      <div class="columns is-vcentered">
+        <div class="column is-5 has-text-centered">
+          <img src="imgs/FigB.png" alt="Methodology diagram" style="border-radius: 12px; box-shadow: 0 15px 45px rgba(0,0,0,0.15);">
+        </div>
+        <div class="column is-7">
+          <h2 class="title is-3">Methodology</h2>
+          <p class="is-size-5">
+            SecDOOD deploys the A2D algorithm to widen modality-specific prediction gaps, making anomalies easier to flag. NP-Mix complements this by synthesizing plausible yet diverse outliers that encourage the model to explore broader feature spaces. Together, they deliver strong precision-recall and AUROC across both near- and far-OOD regimes.
+          </p>
+          <p class="is-size-5"><strong>Approach.</strong> A cloud-hosted HyperNetwork generates device-specific classifier weights from an encrypted summary of device features. The device runs forward-only inference; no gradients or raw data leave the device.</p>
+          <p class="is-size-5"><strong>Workflow.</strong></p>
+          <ol class="is-size-5" style="margin-left: 1.25rem;">
+            <li><strong>Cloud (offline):</strong> Train base model <span style="font-family: 'Courier New', monospace;">M<sub>g</sub></span> and HyperNetwork <span style="font-family: 'Courier New', monospace;">H</span> on ID data.</li>
+            <li><strong>Device (online):</strong> Extract features, score channel importance, homomorphically encrypt top α% channels, mask the rest, and send the encrypted subset.</li>
+            <li><strong>Cloud → Device:</strong> Apply <span style="font-family: 'Courier New', monospace;">H</span> on encrypted features to produce <span style="font-family: 'Courier New', monospace;">Θ<sub>d</sub></span>; return to the device for inference.</li>
+          </ol>
+          <div class="columns is-gapless is-mobile metrics">
+            <div class="column has-text-centered">
+              <p class="title is-2">0</p>
+              <p class="heading">Backprop Steps On-Device</p>
+            </div>
+            <div class="column has-text-centered">
+              <p class="title is-2">5</p>
+              <p class="heading">Supported Datasets</p>
+            </div>
+            <div class="column has-text-centered">
+              <p class="title is-2">3</p>
+              <p class="heading">Modalities</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="getting-started">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Getting Started</h2>
+      <div class="columns is-centered">
+        <div class="column is-10">
+          <div class="box">
+            <h3 class="title is-4">1. Environment Setup</h3>
+            <pre><code>conda create -n secdood python=3.10.4
+conda activate secdood
+pip install -r requirements.txt</code></pre>
+
+            <h3 class="title is-4">2. Download Pretrained Weights</h3>
+            <ul>
+              <li>SlowFast model for RGB (place under <code>HMDB-rgb-flow/pretrained_models</code> and <code>EPIC-rgb-flow/pretrained_models</code>).</li>
+              <li>SlowOnly model for optical flow (same directories as above).</li>
+              <li>Audio backbone renamed to <code>vggsound_avgpool.pth.tar</code> for both HMDB and EPIC pipelines.</li>
+            </ul>
+
+            <h3 class="title is-4">3. Train Near-OOD Models</h3>
+            <pre><code>cd HMDB-rgb-flow/
+python Train.py --near_ood --dataset HMDB --lr 1e-4 --seed 0 \
+  --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred \
+  --use_a2d --a2d_max_hellinger --a2d_ratio 0.5 --use_npmix \
+  --max_ood_hellinger --a2d_ratio_ood 0.5 --ood_entropy_ratio 0.5 \
+  --nepochs 50 --save_best --save_checkpoint --datapath /path/to/HMDB51/
+</code></pre>
+
+            <h3 class="title is-4">4. Evaluate &amp; Export Scores</h3>
+            <pre><code>python Test.py --bsz 16 --num_workers 2 --near_ood --dataset HMDB \
+  --appen a2d_npmix_best_ --resumef /path/to/HMDB_near_ood_a2d_npmix.pt
+python eval_video_flow_near_ood.py --postprocessor msp --appen a2d_npmix_best_ \
+  --dataset HMDB --path HMDB-rgb-flow/
+</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section has-background-light" id="results">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Use Cases</h2>
+      <p class="subtitle is-5 has-text-centered">Deploy SecDOOD where safety, privacy, and reliability are critical.</p>
+      <div class="columns">
+        <div class="column">
+          <div class="box">
+            <h3 class="title is-4">Autonomous Systems</h3>
+            <p>Detect unexpected scenarios in drones, robots, or surveillance platforms without streaming raw data to the cloud.</p>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <h3 class="title is-4">Wearable Computing</h3>
+            <p>Enable real-time anomaly detection for egocentric recordings where bandwidth and compute budgets are tight.</p>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <h3 class="title is-4">Industrial Safety</h3>
+            <p>Monitor factory activities, flag off-nominal events, and keep sensor feeds on premises for compliance.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="resources">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Resources</h2>
+      <div class="columns is-centered">
+        <div class="column is-10">
+          <div class="box">
+            <div class="columns">
+              <div class="column">
+                <h3 class="title is-4">Artifacts</h3>
+                <ul>
+                  <!-- <li><a href="https://huggingface.co/datasets/hdong51/MultiOOD/tree/main" target="_blank" rel="noopener">Benchmarks &amp; Checkpoints</a></li> -->
+                  <!-- <li><a href="https://download.openmmlab.com/mmaction/" target="_blank" rel="noopener">Pretrained Backbones</a></li> -->
+                  <li><a href="https://github.com/Dystopians/SecDOOD" target="_blank" rel="noopener">Source Repository</a></li>
+                </ul>
+              </div>
+              <div class="column">
+                <h3 class="title is-4">Stay in Touch</h3>
+                <ul>
+                  <li>Email: <a href="mailto:peilinca@usc.edu">peilinca@usc.edu</a></li>
+                  <li>Issues &amp; feedback welcome via GitHub.</li>
+                  <li>Cite us with the BibTeX below.</li>
+                </ul>
+              </div>
+            </div>
+            <hr>
+            <p class="title is-4">Citation:</p>
+            <p class="is-size-5"></p>It's an great honor to share idea with you!</p>
+            <br>
+            <pre><code>@article{li2025secure,
+  title={Secure on-device video ood detection without backpropagation},
+  author={Li, Shawn and Cai, Peilin and Zhou, Yuxiao and Ni, Zhiyu and Liang, Renjie and Qin, You and Nian, Yi and Tu, Zhengzhong and Hu, Xiyang and Zhao, Yue},
+  journal={arXiv preprint arXiv:2503.06166},
+  year={2025}
+}
+</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="content has-text-centered">
+        <p>
+          This website adapts the open-source template from <a href="https://github.com/nerfies/nerfies.github.io" target="_blank" rel="noopener">Nerfies</a> under the
+          <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="license noopener">CC BY-SA 4.0</a> license.
+        </p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

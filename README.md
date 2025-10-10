@@ -1,193 +1,235 @@
-<div align="center">
+<h1 align="left">Secure On-Device Video OOD Detection Without Backpropagation</h1>
 
-<h1>Secure On-Device Video OOD Detection Without Backpropagation</h1>
+---
+<div style="margin-top: 8px; font-family: Consolas, monospace; font-size: 16px;" align="center">
 
-<div style="text-align:center">
-<img src="imgs/FigA.png"  width="100%" height="100%">
+*SecDOOD is a secure cloud-device collaboration framework for efficient on-device OOD detection without requiring device-side backpropagation.*
+<p align="center">
+  <a href="https://arxiv.org/abs/2503.06166" target="_blank">
+    <img src="imgs/logo_.png" alt="SecDOOD Logo" width="180">
+  </a><br>
+  <sub><code>Click the logo to read our paper on arXiv</code></sub>
+</p>
+
 </div>
+
+<!-- <p align="center">
+  <img src="imgs/logo_.png" alt="SecDOOD Logo" width="180">
+</p> -->
+<p align="center">
+  <!-- ⭐ Stars badge -->
+  <img alt="GitHub stars" src="https://img.shields.io/github/stars/Dystopians/SecDOOD"/>
+  <!-- 📄 License badge -->
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-blue"/>
+  <!-- 🔖 ArXiv -->
+  <a href="https://arxiv.org/abs/2503.06166"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2503.06166-B31B1B"/></a>
+</p>
+
 
 ---
 
-</div>
+## SecDOOD
+**Goal.** On-device video OOD detection with no device-side backpropagation, while preserving user privacy.
 
-SecDOOD is a secure cloud-device collaboration framework for efficient on-device OOD detection without requiring device-side backpropagation.
+**Approach.** A cloud-hosted HyperNetwork generates device-specific classifier weights from an encrypted summary of device features. The device runs forward-only inference; no gradients or raw data leave the device.
 
-## SecDOOD Benchmark
-SecDOOD is based on five public action recognition datasets (HMDB51, UCF101, EPIC-Kitchens, HAC, and Kinetics-600). 
+**Workflow.**
+
+1. **Cloud (offline):** Train base model $M_g$ and HyperNetwork $H$ on ID data.
+    
+2. **Device (online):** Extract features, score channel importance, homomorphically encrypt top $\alpha\%$ channels, mask the rest, and send encrypted subset.
+    
+3. **Cloud → Device:** Apply $H$ on encrypted features to produce $\Theta_d$; return to device for inference.
+    
+
+**Privacy & Efficiency.** Raw video and full features stay on device; the cloud only sees selectively encrypted channels. Dynamic channel sampling + selective encryption sharply reduce crypto and bandwidth costs with minimal accuracy loss.
+
+**Compatibility.** Plug-and-play with common OOD scores (MSP, Energy, VIM) and modalities (RGB/flow/audio). Supports near- and far-OOD.
+
+**Results.** On HMDB51, UCF101, EPIC-Kitchens, HAC, and Kinetics-600, SecDOOD increases AUROC and lowers FPR@95 versus local post-processing baselines—without any on-device training.
+
+<p align="center">
+  <img src="imgs/FigA.png" alt="SecDOOD Framework Overview" width="100%">
+</p>
+<p align="center"><em></em></p>
 
 ### Prepare Datasets
+SecDOOD is based on five public action recognition datasets (HMDB51, UCF101, EPIC-Kitchens, HAC, and Kinetics-600).
 1. Download HMDB51 video data from [link](https://serre-lab.clps.brown.edu/resource/hmdb-a-large-human-motion-database/#Downloads) and extract. Download HMDB51 optical flow data from [link](https://huggingface.co/datasets/hdong51/MultiOOD/blob/main/hmdb51_flow_mp4.tar.gz) and extract. The directory structure should be modified to match:
-<details>
-<summary>Click for details...</summary>
+   <details>
+   <summary>Click for details...</summary>
+
+   ```
+   HMDB51
+   ├── video
+   |   ├── catch
+   |   |   ├── *.avi
+   |   ├── climb
+   |   |   ├── *.avi
+   |   |── ...
 
 
-```
-HMDB51
-├── video
-|   ├── catch
-|   |   ├── *.avi
-|   ├── climb
-|   |   ├── *.avi
-|   |── ...
+   ├── flow
+   |   ├── *_flow_x.mp4
+   |   ├── *_flow_y.mp4
+   |   ├── ...
+   ```
 
-
-├── flow
-|   ├── *_flow_x.mp4
-|   ├── *_flow_y.mp4
-|   ├── ...
-```
-
-</details>
+   </details>
 
 2. Download UCF101 video data from [link](https://www.crcv.ucf.edu/data/UCF101/UCF101.rar) and extract. Download UCF101 optical flow data from [link](https://huggingface.co/datasets/hdong51/MultiOOD/blob/main/ucf101_flow_mp4.tar.gz) and extract. The directory structure should be modified to match:
-<details>
-<summary>Click for details...</summary>
+   <details>
+   <summary>Click for details...</summary>
+
+   ```
+   UCF101
+   ├── video
+   |   ├── *.avi
+   |   |── ...
 
 
-```
-UCF101
-├── video
-|   ├── *.avi
-|   |── ...
+   ├── flow
+   |   ├── *_flow_x.mp4
+   |   ├── *_flow_y.mp4
+   |   ├── ...
+   ```
 
+   </details>
 
-├── flow
-|   ├── *_flow_x.mp4
-|   ├── *_flow_y.mp4
-|   ├── ...
-```
+3. Download EPIC-Kitchens video and optical flow data by
 
-</details>
+   ```
+   bash utils/download_epic_script.sh
+   ```
 
-3. Download EPIC-Kitchens video and optical flow data by 
-```
-bash utils/download_epic_script.sh 
-```
-Download audio data from [link](https://huggingface.co/datasets/hdong51/Human-Animal-Cartoon/blob/main/EPIC-KITCHENS-audio.zip).
+   Download audio data from [link](https://huggingface.co/datasets/hdong51/Human-Animal-Cartoon/blob/main/EPIC-KITCHENS-audio.zip).
 
-Unzip all files and the directory structure should be modified to match:
-<details>
-<summary>Click for details...</summary>
+   Unzip all files and the directory structure should be modified to match:
+   <details>
+   <summary>Click for details...</summary>
 
+   ```
+   EPIC-KITCHENS
+   ├── rgb
+   |   ├── train
+   |   |   ├── D3
+   |   |   |   ├── P22_05.wav
+   |   |   |   ├── P22_05
+   |   |   |   |     ├── frame_0000000000.jpg
+   |   |   |   |     ├── ...
+   |   |   |   ├── P22_06
+   |   |   |   ├── ...
+   |   ├── test
+   |   |   ├── D3
+   |   |   |   ├── P22_01.wav
+   |   |   |   ├── P22_01
+   |   |   |   |     ├── frame_0000000000.jpg
+   |   |   |   |     ├── ...
+   |   |   |   ├── P22_02
+   |   |   |   ├── ...
 
-```
-EPIC-KITCHENS
-├── rgb
-|   ├── train
-|   |   ├── D3
-|   |   |   ├── P22_05.wav
-|   |   |   ├── P22_05
-|   |   |   |     ├── frame_0000000000.jpg
-|   |   |   |     ├── ...
-|   |   |   ├── P22_06
-|   |   |   ├── ...
-|   ├── test
-|   |   ├── D3
-|   |   |   ├── P22_01.wav
-|   |   |   ├── P22_01
-|   |   |   |     ├── frame_0000000000.jpg
-|   |   |   |     ├── ...
-|   |   |   ├── P22_02
-|   |   |   ├── ...
+   ├── flow
+   |   ├── train
+   |   |   ├── D3
+   |   |   |   ├── P22_05
+   |   |   |   |     ├── frame_0000000000.jpg
+   |   |   |   |     ├── ...
+   |   |   |   ├── P22_06
+   |   |   |   ├── ...
+   |   ├── test
+   |   |   ├── D3
+   |   |   |   ├── P22_01
+   |   |   |   |     ├── frame_0000000000.jpg
+   |   |   |   |     ├── ...
+   |   |   |   ├── P22_02
+   |   |   |   ├── ...
+   ```
 
-├── flow
-|   ├── train
-|   |   ├── D3
-|   |   |   ├── P22_05
-|   |   |   |     ├── frame_0000000000.jpg
-|   |   |   |     ├── ...
-|   |   |   ├── P22_06
-|   |   |   ├── ...
-|   ├── test
-|   |   ├── D3
-|   |   |   ├── P22_01
-|   |   |   |     ├── frame_0000000000.jpg
-|   |   |   |     ├── ...
-|   |   |   ├── P22_02
-|   |   |   ├── ...
-```
-
-</details>
+   </details>
 
 4. Download HAC video, audio and optical flow data from [link](https://huggingface.co/datasets/hdong51/Human-Animal-Cartoon/tree/main) and extract. The directory structure should be modified to match:
-<details>
-<summary>Click for details...</summary>
+   <details>
+   <summary>Click for details...</summary>
+
+   ```
+   HAC
+   ├── human
+   |   ├── videos
+   |   |   ├── ...
+   |   ├── flow
+   |   |   ├── ...
+   |   ├── audio
+   |   |   ├── ...
+
+   ├── animal
+   |   ├── videos
+   |   |   ├── ...
+   |   ├── flow
+   |   |   ├── ...
+   |   ├── audio
+   |   |   ├── ...
+
+   ├── cartoon
+   |   ├── videos
+   |   |   ├── ...
+   |   ├── flow
+   |   |   ├── ...
+   |   ├── audio
+   |   |   ├── ...
+   ```
+
+   </details>
+
+5. Download Kinetics-600 video data by
+
+   ```
+   wget -i utils/filtered_k600_train_path.txt
+   ```
+
+   Extract all files and get audio data from video data by
+
+   ```
+   python utils/generate_audio_files.py
+   ```
+
+   Download Kinetics-600 optical flow data (kinetics600_flow_mp4_part_*) from [link](https://huggingface.co/datasets/hdong51/MultiOOD/tree/main) and extract (run `cat kinetics600_flow_mp4_part_* > kinetics600_flow_mp4.tar.gz` and then `tar -zxvf kinetics600_flow_mp4.tar.gz`).
+
+   Unzip all files and the directory structure should be modified to match:
+   <details>
+   <summary>Click for details...</summary>
+
+   ```
+   Kinetics-600
+   ├── video
+   |   ├── acting in play
+   |   |   ├── *.mp4
+   |   |   ├── *.wav
+   |   |── ...
 
 
-```
-HAC
-├── human
-|   ├── videos
-|   |   ├── ...
-|   ├── flow
-|   |   ├── ...
-|   ├── audio
-|   |   ├── ...
+   ├── flow
+   |   ├── acting in play
+   |   |   ├── *_flow_x.mp4
+   |   |   ├── *_flow_y.mp4
+   |   ├── ...
+   ```
 
-├── animal
-|   ├── videos
-|   |   ├── ...
-|   ├── flow
-|   |   ├── ...
-|   ├── audio
-|   |   ├── ...
-
-├── cartoon
-|   ├── videos
-|   |   ├── ...
-|   ├── flow
-|   |   ├── ...
-|   ├── audio
-|   |   ├── ...
-```
-
-</details>
-
-5. Download Kinetics-600 video data by 
-```
-wget -i utils/filtered_k600_train_path.txt
-```
-Extract all files and get audio data from video data by
-```
-python utils/generate_audio_files.py
-```
-Download Kinetics-600 optical flow data (kinetics600_flow_mp4_part_*) from [link](https://huggingface.co/datasets/hdong51/MultiOOD/tree/main) and extract (run `cat kinetics600_flow_mp4_part_* > kinetics600_flow_mp4.tar.gz` and then `tar -zxvf kinetics600_flow_mp4.tar.gz`).
-
-Unzip all files and the directory structure should be modified to match:
-<details>
-<summary>Click for details...</summary>
-
-
-```
-Kinetics-600
-├── video
-|   ├── acting in play
-|   |   ├── *.mp4
-|   |   ├── *.wav
-|   |── ...
-
-
-├── flow
-|   ├── acting in play
-|   |   ├── *_flow_x.mp4
-|   |   ├── *_flow_y.mp4
-|   ├── ...
-```
-
-</details>
+   </details>
 
 ### Dataset Splits
 The splits for Multimodal Near-OOD and Far-OOD Benchmarks are provided under `HMDB-rgb-flow/splits/` for HMDB51, UCF101, HAC, and Kinetics-600, and under `EPIC-rgb-flow/splits/` for EPIC-Kitchens.
 
-
-## Methodology
-<div style="text-align:left">
-<img src="imgs/FigB.png"  width="80%" height="100%">
-</div>
-
 ---
 
+## Methodology
+
+<p align="center">
+  <img src="imgs/FigB_round.png" alt="SecDOOD Methodology" width="80%">
+</p>
+
 An overview of the proposed framework for Multimodal OOD Detection. We introduce A2D algorithm to encourage enlarging the prediction discrepancy across modalities. Additionally, we propose a novel outlier synthesis algorithm, NP-Mix, designed to explore broader feature spaces, which complements A2D to strengthen the OOD detection performance.
+
+---
 
 ## Code
 The code was tested using `Python 3.10.4`, `torch 1.11.0+cu113` and `NVIDIA GeForce RTX 3090`. More dependencies are in `requirement.txt`.
@@ -214,7 +256,7 @@ cd HMDB-rgb-flow/
 Train the Near-OOD model for HMDB:
 
 ```
-python Train.py --near_ood --dataset 'HMDB' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.5 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.5 --ood_entropy_ratio 0.5 --nepochs 50 --appen '' --save_best --save_checkpoint --datapath '/path/to/HMDB51/' 
+python Train.py --near_ood --dataset 'HMDB' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.5 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.5 --ood_entropy_ratio 0.5 --nepochs 50 --appen '' --save_best --save_checkpoint --datapath '/path/to/HMDB51/'
 ```
 
 You can also download our provided checkpoints (`HMDB_near_ood_baseline.pt`, `HMDB_near_ood_a2d.pt`, and `HMDB_near_ood_a2d_npmix.pt`) from [link](https://huggingface.co/datasets/hdong51/MultiOOD/tree/main/checkpoints).
@@ -231,7 +273,6 @@ python eval_video_flow_near_ood.py --postprocessor msp --appen 'a2d_npmix_best_'
 
 </details>
 
-
 #### UCF101 50/51
 <details>
 <summary>Click for details...</summary>
@@ -243,7 +284,7 @@ cd HMDB-rgb-flow/
 Train the Near-OOD model for UCF:
 
 ```
-python Train.py --near_ood --dataset 'UCF' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.5 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.5 --ood_entropy_ratio 0.5 --nepochs 50 --appen '' --save_best --save_checkpoint --datapath '/path/to/UCF101/' 
+python Train.py --near_ood --dataset 'UCF' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.5 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.5 --ood_entropy_ratio 0.5 --nepochs 50 --appen '' --save_best --save_checkpoint --datapath '/path/to/UCF101/'
 ```
 
 You can also download our provided checkpoints (`UCF_near_ood_baseline.pt`, `UCF_near_ood_a2d.pt`, and `UCF_near_ood_a2d_npmix.pt`) from [link](https://huggingface.co/datasets/hdong51/MultiOOD/tree/main/checkpoints).
@@ -271,19 +312,19 @@ cd EPIC-rgb-flow/
 Train the Near-OOD baseline model for EPIC:
 
 ```
-python Train_Epic.py --dataset 'EPIC' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/EPIC-Kitchens/' 
+python Train_Epic.py --dataset 'EPIC' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/EPIC-Kitchens/'
 ```
 
 Train the Near-OOD model using A2D for EPIC:
 
 ```
-python Train_Epic.py --dataset 'EPIC' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 1.0 --nepochs 50 --appen '' --save_best --save_checkpoint --datapath '/path/to/EPIC-Kitchens/' 
+python Train_Epic.py --dataset 'EPIC' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 1.0 --nepochs 50 --appen '' --save_best --save_checkpoint --datapath '/path/to/EPIC-Kitchens/'
 ```
 
 Train the Near-OOD model using A2D and NP-Mix for EPIC:
 
 ```
-python Train_Epic.py --dataset 'EPIC' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.1 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.1 --ood_entropy_ratio 0.1 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/EPIC-Kitchens/' 
+python Train_Epic.py --dataset 'EPIC' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.1 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.1 --ood_entropy_ratio 0.1 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/EPIC-Kitchens/'
 ```
 
 You can also download our provided checkpoints (`EPIC_near_ood_baseline.pt`, `EPIC_near_ood_a2d.pt`, and `EPIC_near_ood_a2d_npmix.pt`) from [link](https://huggingface.co/datasets/hdong51/MultiOOD/tree/main/checkpoints).
@@ -311,19 +352,19 @@ cd HMDB-rgb-flow/
 Train the Near-OOD baseline model for Kinetics:
 
 ```
-python Train.py --near_ood --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/' 
+python Train.py --near_ood --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/'
 ```
 
 Train the Near-OOD model using A2D for Kinetics:
 
 ```
-python Train.py --near_ood --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 1.0 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/' 
+python Train.py --near_ood --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 1.0 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/'
 ```
 
 Train the Near-OOD model using A2D and NP-Mix for Kinetics:
 
 ```
-python Train.py --near_ood --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.1 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.1 --ood_entropy_ratio 0.1 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/' 
+python Train.py --near_ood --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.1 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.1 --ood_entropy_ratio 0.1 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/'
 ```
 
 You can also download our provided checkpoints (`Kinetics_near_ood_baseline.pt`, `Kinetics_near_ood_a2d.pt`, and `Kinetics_near_ood_a2d_npmix.pt`) from [link](https://huggingface.co/datasets/hdong51/MultiOOD/tree/main/checkpoints).
@@ -340,7 +381,6 @@ python eval_video_flow_near_ood.py --postprocessor msp --appen 'a2d_npmix_best_'
 
 </details>
 
-
 ### Multimodal Far-OOD Benchmark
 #### HMDB51 as ID
 
@@ -354,13 +394,13 @@ cd HMDB-rgb-flow/
 Train the Far-OOD baseline model for HMDB:
 
 ```
-python Train.py --dataset 'HMDB' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --nepochs 50 --appen '' --save_best --save_checkpoint --datapath '/path/to/HMDB51/' 
+python Train.py --dataset 'HMDB' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --nepochs 50 --appen '' --save_best --save_checkpoint --datapath '/path/to/HMDB51/'
 ```
 
 Train the Far-OOD model using A2D and NP-Mix for HMDB:
 
 ```
-python Train.py --dataset 'HMDB' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.1 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.1 --ood_entropy_ratio 0.1 --nepochs 50 --appen '' --save_best --save_checkpoint --datapath '/path/to/HMDB51/' 
+python Train.py --dataset 'HMDB' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.1 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.1 --ood_entropy_ratio 0.1 --nepochs 50 --appen '' --save_best --save_checkpoint --datapath '/path/to/HMDB51/'
 ```
 
 You can also download our provided checkpoints (`HMDB_far_ood_baseline.pt` and `HMDB_far_ood_a2d_npmix.pt`) from [link](https://huggingface.co/datasets/hdong51/MultiOOD/tree/main/checkpoints).
@@ -393,14 +433,12 @@ cd EPIC-rgb-flow/
 python Test_far.py --bsz 16 --num_workers 2 --far_ood --dataset 'HMDB' --ood_dataset 'EPIC' --appen 'a2d_npmix_best_' --resumef '/path/to/HMDB_far_ood_a2d_npmix.pt'
 ```
 
-
 Evaluation for UCF (change `--postprocessor` to different score functions, for VIM you should also pass `--resume_file checkpoint.pt`, where checkpoint.pt is the trained checkpoint, change `--ood_dataset` to UCF, EPIC, HAC, or Kinetics):
 ```
 python eval_video_flow_far_ood.py --postprocessor msp --appen 'a2d_npmix_best_' --dataset 'HMDB' --ood_dataset 'UCF' --path 'HMDB-rgb-flow/'
 ```
 
 </details>
-
 
 #### Kinetics as ID
 
@@ -414,13 +452,13 @@ cd HMDB-rgb-flow/
 Train the Far-OOD baseline model for Kinetics:
 
 ```
-python Train.py --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --nepochs 10 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/' 
+python Train.py --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --nepochs 10 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/'
 ```
 
 Train the Far-OOD model using A2D and NP-Mix for Kinetics:
 
 ```
-python Train.py --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 3 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.1 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.1 --ood_entropy_ratio 0.1 --nepochs 10 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/' 
+python Train.py --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 3 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.1 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.1 --ood_entropy_ratio 0.1 --nepochs 10 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/'
 ```
 
 You can also download our provided checkpoints (`Kinetics_far_ood_baseline.pt` and `Kinetics_far_ood_a2d_npmix.pt`) from [link](https://huggingface.co/datasets/hdong51/MultiOOD/tree/main/checkpoints).
@@ -453,7 +491,6 @@ cd EPIC-rgb-flow/
 python Test_far.py --bsz 16 --num_workers 2 --far_ood --dataset 'Kinetics' --ood_dataset 'EPIC' --appen 'a2d_npmix_best_' --resumef '/path/to/Kinetics_far_ood_a2d_npmix.pt'
 ```
 
-
 Evaluation for UCF (change `--postprocessor` to different score functions, for VIM you should also pass `--resume_file checkpoint.pt`, where checkpoint.pt is the trained checkpoint, change `--ood_dataset` to UCF, EPIC, HAC, or HMDB):
 ```
 python eval_video_flow_far_ood.py --postprocessor msp --appen 'a2d_npmix_best_' --dataset 'Kinetics' --ood_dataset 'UCF' --path 'HMDB-rgb-flow/'
@@ -474,13 +511,13 @@ cd EPIC-rgb-flow/
 Train the Near-OOD baseline model for EPIC:
 
 ```
-python Train_audio_epic.py --dataset 'EPIC' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/EPIC-Kitchens/' 
+python Train_audio_epic.py --dataset 'EPIC' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/EPIC-Kitchens/'
 ```
 
 Train the Near-OOD model using A2D and NP-Mix for EPIC:
 
 ```
-python Train_audio_epic.py --dataset 'EPIC' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.5 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.5 --ood_entropy_ratio 0.5 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/EPIC-Kitchens/' 
+python Train_audio_epic.py --dataset 'EPIC' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.5 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.5 --ood_entropy_ratio 0.5 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/EPIC-Kitchens/'
 ```
 
 You can also download our provided checkpoints (`EPIC_near_ood_vfa_baseline.pt` and `EPIC_near_ood_vfa_a2d_npmix.pt`) from [link](https://huggingface.co/datasets/hdong51/MultiOOD/tree/main/checkpoints).
@@ -508,13 +545,13 @@ cd HMDB-rgb-flow/
 Train the Near-OOD baseline model for Kinetics:
 
 ```
-python Train_audio.py --near_ood --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/' 
+python Train_audio.py --near_ood --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/'
 ```
 
 Train the Near-OOD model using A2D and NP-Mix for Kinetics:
 
 ```
-python Train_audio.py --near_ood --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.5 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.5 --ood_entropy_ratio 0.5 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/' 
+python Train_audio.py --near_ood --dataset 'Kinetics' --lr 0.0001 --seed 0 --bsz 16 --num_workers 10 --start_epoch 10 --use_single_pred --use_a2d --a2d_max_hellinger --a2d_ratio 0.5 --use_npmix --max_ood_hellinger --a2d_ratio_ood 0.5 --ood_entropy_ratio 0.5 --nepochs 20 --appen '' --save_best --save_checkpoint --datapath '/path/to/Kinetics-600/'
 ```
 
 You can also download our provided checkpoints (`Kinetics_near_ood_vfa_baseline.pt` and `Kinetics_near_ood_vfa_a2d_npmix.pt`) from [link](https://huggingface.co/datasets/hdong51/MultiOOD/tree/main/checkpoints).
@@ -531,6 +568,20 @@ python eval_video_flow_near_ood.py --postprocessor msp --appen 'vfa_a2d_npmix_be
 
 </details>
 
+---
 
 ## Contact
 If you have any questions, please send an email to peilinca@usc.edu or make an issue :)
+
+---
+
+## Citation
+It's an great honor to share idea with you!
+```
+@article{li2025secure,
+  title={Secure on-device video ood detection without backpropagation},
+  author={Li, Shawn and Cai, Peilin and Zhou, Yuxiao and Ni, Zhiyu and Liang, Renjie and Qin, You and Nian, Yi and Tu, Zhengzhong and Hu, Xiyang and Zhao, Yue},
+  journal={arXiv preprint arXiv:2503.06166},
+  year={2025}
+}
+```
