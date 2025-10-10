@@ -227,7 +227,16 @@ The splits for Multimodal Near-OOD and Far-OOD Benchmarks are provided under `HM
   <img src="imgs/FigB_round.png" alt="SecDOOD Methodology" width="80%">
 </p>
 
-An overview of the proposed framework for Multimodal OOD Detection. We introduce A2D algorithm to encourage enlarging the prediction discrepancy across modalities. Additionally, we propose a novel outlier synthesis algorithm, NP-Mix, designed to explore broader feature spaces, which complements A2D to strengthen the OOD detection performance.
+<p><strong>SecDOOD</strong> is a cloud–device collaborative pipeline for on-device video OOD detection with <em>zero device-side backpropagation</em>. A cloud-hosted <em>HyperNetwork</em> <code>H</code> is trained on in-distribution (ID) data and returns <em>device-specific</em> classifier parameters <code>Θ<sub>d</sub></code>; the device performs forward-only inference.</p>
+
+<ol>
+  <li><strong>Device feature extraction.</strong> Compute intermediate features and rank channels via Shapley-style contribution estimates.</li>
+  <li><strong>Selective encryption &amp; upload.</strong> Encrypt the top <strong>50%</strong> most informative channels (mask the rest) and send only this encrypted subset to the cloud.</li>
+  <li><strong>Cloud personalization.</strong> Evaluate <code>H</code> on the encrypted features to produce <code>Θ<sub>d</sub></code>. Raw videos and full feature tensors never leave the device.</li>
+  <li><strong>On-device inference.</strong> Decrypt and inject <code>Θ<sub>d</sub></code> into the local head and compute OOD scores (e.g., MSP, Energy, VIM); inference is forward-only.</li>
+</ol>
+
+<p><em>Privacy &amp; efficiency.</em> Dynamic channel selection plus selective encryption reduces bandwidth and cryptographic cost while preserving accuracy, enabling plug-and-play deployment on resource-constrained devices.</p>
 
 ---
 
@@ -576,7 +585,7 @@ If you have any questions, please send an email to peilinca@usc.edu or make an i
 ---
 
 ## Citation
-It's an great honor to share idea with you!
+It's a great honor to share idea with you!
 ```
 @article{li2025secure,
   title={Secure on-device video ood detection without backpropagation},

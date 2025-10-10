@@ -88,7 +88,7 @@
         <div class="column is-4">
           <div class="box">
             <h3 class="title is-4">Approach</h3>
-            <p>A cloud-hosted HyperNetwork generates device-specific classifier weights from an encrypted summary of device features. Devices run forward-only inference; gradients and raw data never leave the device.</p>
+            <p>A cloud-hosted HyperNetwork generates device-specific classifier weights from an encrypted subset of selected feature channels. Devices run forward-only inference; gradients and raw data never leave the device.</p>
           </div>
         </div>
         <div class="column is-4">
@@ -143,30 +143,35 @@
         <div class="column is-6">
           <div class="box feature-card">
             <h3 class="title is-4">Multimodal Fusion</h3>
-            <p>Integrates RGB video, optical flow, and audio cues for robust detection under diverse conditions.</p>
+            <p>Integrates RGB video, optical flow, and audio cues (when available) for robust detection under diverse conditions.</p>
           </div>
         </div>
         <div class="column is-6">
           <div class="box feature-card">
             <h3 class="title is-4">Backprop-Free On-Device</h3>
-            <p>Performs inference-only OOD detection on-device, keeping data local and reducing compute costs.</p>
+            <p>Performs forward-only OOD detection on-device; raw data and full feature tensors never leave the device.</p>
+          </div>
+        </div>
+  
+        <!-- Replaced cards start here -->
+        <div class="column is-6">
+          <div class="box feature-card">
+            <h3 class="title is-4">HyperNetwork Personalization</h3>
+            <p>A cloud-hosted HyperNetwork <em>H</em> produces device-specific classifier weights (Θ<sub>d</sub>) from an encrypted subset of device features, enabling per-device adaptation without local training.</p>
           </div>
         </div>
         <div class="column is-6">
           <div class="box feature-card">
-            <h3 class="title is-4">Adaptive A2D Algorithm</h3>
-            <p>Encourages prediction discrepancy across modalities to expose uncertain or anomalous inputs.</p>
+            <h3 class="title is-4">Selective Encryption (50% by Shapley)</h3>
+            <p>The device ranks feature channels via Shapley approximations and homomorphically encrypts the top 50% while masking the rest, cutting bandwidth and crypto cost with minimal accuracy impact.</p>
           </div>
         </div>
-        <div class="column is-6">
-          <div class="box feature-card">
-            <h3 class="title is-4">NP-Mix Outlier Synthesis</h3>
-            <p>Explores wider feature spaces through synthesized outliers, boosting near- and far-OOD performance.</p>
-          </div>
-        </div>
+        <!-- Replaced cards end here -->
+  
       </div>
     </div>
   </section>
+  
 
   <section class="section" id="benchmark">
     <div class="container is-max-desktop">
@@ -245,10 +250,7 @@
         </div>
         <div class="column is-7">
           <h2 class="title is-3">Methodology</h2>
-          <p class="is-size-5">
-            SecDOOD deploys the A2D algorithm to widen modality-specific prediction gaps, making anomalies easier to flag. NP-Mix complements this by synthesizing plausible yet diverse outliers that encourage the model to explore broader feature spaces. Together, they deliver strong precision-recall and AUROC across both near- and far-OOD regimes.
-          </p>
-          <p class="is-size-5"><strong>Approach.</strong> A cloud-hosted HyperNetwork generates device-specific classifier weights from an encrypted summary of device features. The device runs forward-only inference; no gradients or raw data leave the device.</p>
+          <p class="is-size-5"><strong>Approach.</strong> A cloud-hosted HyperNetwork generates device-specific classifier weights from an encrypted subset of selected feature channels. The device runs forward-only inference; no gradients or raw data leave the device.</p>
           <p class="is-size-5"><strong>Workflow.</strong></p>
           <ol class="is-size-5" style="margin-left: 1.25rem;">
             <li><strong>Cloud (offline):</strong> Train base model <span style="font-family: 'Courier New', monospace;">M<sub>g</sub></span> and HyperNetwork <span style="font-family: 'Courier New', monospace;">H</span> on ID data.</li>
@@ -366,7 +368,7 @@ python eval_video_flow_near_ood.py --postprocessor msp --appen a2d_npmix_best_ \
             </div>
             <hr>
             <p class="title is-4">Citation:</p>
-            <p class="is-size-5"></p>It's an great honor to share idea with you!</p>
+            <p class="is-size-5"></p>It's a great honor to share idea with you!</p>
             <br>
             <pre><code>@article{li2025secure,
   title={Secure on-device video ood detection without backpropagation},
