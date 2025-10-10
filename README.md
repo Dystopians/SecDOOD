@@ -585,7 +585,6 @@ If you have any questions, please send an email to peilinca@usc.edu or make an i
 ---
 
 ## Citation
-It's a great honor to share idea with you!
 ```
 @article{li2025secure,
   title={Secure on-device video ood detection without backpropagation},
